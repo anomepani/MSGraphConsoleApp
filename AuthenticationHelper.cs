@@ -9,21 +9,27 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.Graph;
 using Microsoft.Identity.Client;
+using System.Configuration;
 
 namespace MSGraphConsole
 {
     public class AuthenticationHelper
     {
         // The Client ID is used by the application to uniquely identify itself to the v2.0 authentication endpoint.
-        static readonly string clientId = "51509718-3125-438f-z043-z70052846534";
-        public static string[] Scopes = { "User.Read", "Mail.Send", "Files.ReadWrite" };
 
-        public static PublicClientApplication IdentityClientApp = new PublicClientApplication(clientId);
+        //static string tenant = "common"; // Tenant for Custom Translator
+        static string TenantID = ConfigurationManager.AppSettings["TenantID"]; // Tenant for Custom Translator
+        static string ClientID = ConfigurationManager.AppSettings["ClientID"]; // Enter your ClientID that you created in https://apps.dev.microsoft.com 
+        static string authorityUri = $"https://login.microsoftonline.com/{TenantID}/oauth2/v2.0";
+        public static string[] Scopes = ConfigurationManager.AppSettings["Scopes"].Split(',');
+
+        public static PublicClientApplication IdentityClientApp = new PublicClientApplication(ClientID, authorityUri);
 
         public static string TokenForUser = null;
         public static DateTimeOffset Expiration;
 
         private static GraphServiceClient graphClient = null;
+
 
         // Get an access token for the given context and resourceId. An attempt is first made to 
         // acquire the token silently. If that fails, then we try to acquire the token by prompting the user.
